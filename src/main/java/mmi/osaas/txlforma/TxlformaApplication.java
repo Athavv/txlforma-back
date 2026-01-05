@@ -1,0 +1,15 @@
+package mmi.osaas.txlforma;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EnableScheduling
+public class TxlformaApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TxlformaApplication.class, args);
+	}
+
+}

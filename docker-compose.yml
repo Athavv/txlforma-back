@@ -1,0 +1,71 @@
+name: txlforma
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: txlforma-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: txlforma_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: txlforma
+      MYSQL_PASSWORD: txlformamdp
+    ports:
+      - "3306:3306"
+    volumes:
+      - txlforma_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - txlforma-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: txlforma-back
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/txlforma_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: txlforma
+      SPRING_DATASOURCE_PASSWORD: txlformamdp
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8080
+      APP_JWT_SECRET: VGhpcyBpcyBhIHNlY3JldCBmb3IgdGVzdCByZXBvciBtb3JlX3RoYW4gMzJieXRlcyE=
+      APP_JWT_EXPIRATION_MS: 86400000
+      APP_UPLOADS_DIRECTORY: uploads
+    ports:
+      - "8080:8080"
+    volumes:
+      - txlforma_data:/app/uploads
+    networks:
+      - txlforma-network
+
+  front:
+    build:
+      context: ../front/txlforma-front
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/api
+    container_name: txlforma-front
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "3000:80"
+    networks:
+      - txlforma-network
+
+volumes:
+  txlforma_data:
+    driver: local
+
+networks:
+  txlforma-network:
+    driver: bridge

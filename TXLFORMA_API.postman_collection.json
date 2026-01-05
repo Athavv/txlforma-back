@@ -1,0 +1,1447 @@
+{
+  "info": {
+    "_postman_id": "309e31c4-39e5-47e2-90c2-4f200bd1024a",
+    "name": "TXLFORMA API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41467614",
+    "_collection_link": "https://osaas7-4566.postman.co/workspace/Osaas-Workspace~ee40be06-67b4-4889-814e-ba1918a11d10/collection/41467614-309e31c4-39e5-47e2-90c2-4f200bd1024a?action=share&source=collection_link&creator=41467614"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Lango\",\n  \"lastname\": \"Packianathan\",\n  \"email\": \"lango@txlforma.fr\",\n  \"username\": \"lango\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login (public) — capture token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = {};",
+                  "try { json = pm.response.json(); } catch(e) {}",
+                  "if (json && json.token) {",
+                  "  pm.environment.set('token', json.token);",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  pm.test('JWT token capturé', function () { pm.expect(pm.environment.get('token')).to.be.a('string'); });",
+                  "  if (json.user && json.user.id) { pm.environment.set('userId', json.user.id); pm.collectionVariables.set('userId', json.user.id); }",
+                  "} else { pm.test('Réponse contient un token', function(){ pm.expect.fail('Pas de champ token'); }); }"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@txlforma.fr\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public (sans authentification)",
+      "item": [
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "List categories (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "categories"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get category by id (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/categories/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "categories", "1"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Formations",
+          "item": [
+            {
+              "name": "List formations (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/formations",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "formations"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get formation by id (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/formations/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "formations", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get formations by category (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/formations?categoryId=1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "formations"],
+                  "query": [
+                    {
+                      "key": "categoryId",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Sessions",
+          "item": [
+            {
+              "name": "List sessions (public, avec filtres)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions?formation=1&formateur=2&date=2025-02-01",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions"],
+                  "query": [
+                    {
+                      "key": "formation",
+                      "value": "1",
+                      "description": "ID de la formation (optionnel)"
+                    },
+                    {
+                      "key": "formateur",
+                      "value": "2",
+                      "description": "ID du formateur (optionnel)"
+                    },
+                    {
+                      "key": "date",
+                      "value": "2025-02-01",
+                      "description": "Date de début (format: YYYY-MM-DD, optionnel)"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get session by id (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get sessions by formateur (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions/formateur/2",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions", "formateur", "2"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get available formateurs (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions/formateurs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions", "formateurs"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User (authentifié)",
+      "item": [
+        {
+          "name": "Profil",
+          "item": [
+            {
+              "name": "Get my profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "me"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get user by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "{{userId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update my profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstname\": \"Lango\",\n  \"lastname\": \"Packianathan\",\n  \"email\": \"lango@txlforma.fr\",\n  \"password\": \"password123\",\n  \"imageUrl\": \"/api/files/users/image.jpg\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "{{userId}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Panier",
+          "item": [
+            {
+              "name": "Get panier",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/panier",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "panier"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Add session to panier",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/panier/sessions/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "panier", "sessions", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove session from panier",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/panier/sessions/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "panier", "sessions", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Clear panier",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/panier",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "panier"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Paiement",
+          "item": [
+            {
+              "name": "Create checkout session",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "let json = {};",
+                      "try { json = pm.response.json(); } catch(e) {}",
+                      "if (json && json.sessionId) {",
+                      "  pm.collectionVariables.set('checkoutSessionId', json.sessionId);",
+                      "  pm.test('Checkout Session ID capturé', function () { pm.expect(json.sessionId).to.be.a('string'); });",
+                      "  if (json.url) {",
+                      "    pm.collectionVariables.set('checkoutUrl', json.url);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/create-checkout-session",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "payments", "create-checkout-session"]
+                },
+                "description": "Crée une session Stripe Checkout pour le panier EN_COURS de l'utilisateur. Retourne une URL de redirection vers Stripe."
+              },
+              "response": []
+            },
+            {
+              "name": "Create checkout session (panier spécifique)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "let json = {};",
+                      "try { json = pm.response.json(); } catch(e) {}",
+                      "if (json && json.sessionId) {",
+                      "  pm.collectionVariables.set('checkoutSessionId', json.sessionId);",
+                      "  pm.test('Checkout Session ID capturé', function () { pm.expect(json.sessionId).to.be.a('string'); });",
+                      "  if (json.url) {",
+                      "    pm.collectionVariables.set('checkoutUrl', json.url);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/create-checkout-session?panierId={{panierId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "payments", "create-checkout-session"],
+                  "query": [
+                    {
+                      "key": "panierId",
+                      "value": "{{panierId}}",
+                      "description": "ID du panier à payer (optionnel, par défaut le panier EN_COURS)"
+                    }
+                  ]
+                },
+                "description": "Crée une session Stripe Checkout pour un panier spécifique. Retourne une URL de redirection vers Stripe."
+              },
+              "response": []
+            },
+            {
+              "name": "Sync checkout session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/sync-checkout-session?sessionId={{checkoutSessionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "payments", "sync-checkout-session"],
+                  "query": [
+                    {
+                      "key": "sessionId",
+                      "value": "{{checkoutSessionId}}",
+                      "description": "ID de la session Stripe Checkout"
+                    }
+                  ]
+                },
+                "description": "Synchronise manuellement le statut d'un paiement depuis Stripe Checkout. Utilisez ce endpoint si le webhook n'a pas été reçu et que le paiement est réussi dans Stripe mais pas dans votre base de données."
+              },
+              "response": []
+            },
+            {
+              "name": "Webhook Stripe (public)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Stripe-Signature",
+                    "value": "t=1234567890,v1=signature"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{checkoutSessionId}}\",\n      \"payment_intent\": \"pi_xxx\"\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/webhook",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "payments", "webhook"]
+                },
+                "description": "Endpoint webhook pour recevoir les événements Stripe. Public (pas d'authentification requise). Utilisé par Stripe pour notifier les changements de statut des paiements. Événement principal: checkout.session.completed"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Participations",
+          "item": [
+            {
+              "name": "Get my participations",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/participations/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "participations", "me"]
+                },
+                "description": "Récupère toutes les participations de l'utilisateur connecté. Retourne un DTO allégé (ParticipationDTO) avec les informations essentielles de la session, formation et formateur."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Emargements",
+          "item": [
+            {
+              "name": "Sign participation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participationId\": 1,\n  \"signatureData\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/emargements/sign",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "emargements", "sign"]
+                },
+                "description": "Signe une participation avec une signature base64. Met automatiquement le statut à PRESENT. L'émargement est possible dès le début de la session jusqu'à la fin."
+              },
+              "response": []
+            },
+            {
+              "name": "Get emargement by participation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/emargements/participation/{{participationId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "emargements",
+                    "participation",
+                    "{{participationId}}"
+                  ]
+                },
+                "description": "Récupère l'émargement d'une participation. Retourne un DTO allégé (EmargementDTO) avec les informations essentielles. Accessible par le propriétaire ou le formateur/admin."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Notes",
+          "item": [
+            {
+              "name": "Get my notes",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notes/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notes", "me"]
+                },
+                "description": "Récupère toutes mes notes. Retourne un DTO allégé (NoteDTO) avec les informations essentielles. Accessible par tout utilisateur authentifié."
+              },
+              "response": []
+            },
+            {
+              "name": "Get note by participation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notes/participation/{{participationId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "notes",
+                    "participation",
+                    "{{participationId}}"
+                  ]
+                },
+                "description": "Récupère la note d'une participation. Retourne un DTO allégé (NoteDTO) avec les informations essentielles. Accessible par le participant ou le formateur."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Attestations",
+          "item": [
+            {
+              "name": "Get my attestations",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/attestations/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "attestations", "me"]
+                },
+                "description": "Récupère toutes mes attestations. Accessible par tout utilisateur authentifié."
+              },
+              "response": []
+            },
+            {
+              "name": "Generate attestation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/attestations/generate/{{participationId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "attestations",
+                    "generate",
+                    "{{participationId}}"
+                  ]
+                },
+                "description": "Génère une attestation pour une participation. Type déterminé automatiquement (PRESENCE si émargé, SUCCES si note ≥ 10 après 14j)."
+              },
+              "response": []
+            },
+            {
+              "name": "Download attestation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/attestations/download/{{attestationId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "attestations",
+                    "download",
+                    "{{attestationId}}"
+                  ]
+                },
+                "description": "Télécharge le PDF d'une attestation."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Formateur (FORMATEUR/ADMIN)",
+      "item": [
+        {
+          "name": "Sessions",
+          "item": [
+            {
+              "name": "Get my sessions (FORMATEUR)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions", "me"]
+                },
+                "description": "Récupère toutes les sessions du formateur connecté. Retourne un DTO allégé (SessionResponseDTO) avec les informations essentielles. Nécessite le rôle FORMATEUR."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Participations",
+          "item": [
+            {
+              "name": "Get session participants",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/participations/session/{{sessionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "participations", "session", "{{sessionId}}"]
+                },
+                "description": "Récupère tous les participants d'une session. Retourne un DTO allégé (SessionParticipantDTO) avec les informations essentielles de l'utilisateur et du paiement. Nécessite le rôle FORMATEUR ou ADMIN. Les formateurs ne peuvent voir que les participants de leurs propres sessions."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Emargements",
+          "item": [
+            {
+              "name": "Get emargements by session",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/emargements/session/{{sessionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "emargements", "session", "{{sessionId}}"]
+                },
+                "description": "Récupère tous les émargements d'une session. Retourne un DTO allégé (EmargementDTO) avec les informations essentielles. Nécessite le rôle FORMATEUR ou ADMIN."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Notes",
+          "item": [
+            {
+              "name": "Create note (FORMATEUR)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participationId\": 1,\n  \"note\": 15.5\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/notes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notes"]
+                },
+                "description": "Attribue une note à un participant présent. Retourne un DTO allégé (NoteDTO) avec les informations essentielles. Nécessite le rôle FORMATEUR. La note doit être entre 0 et 20."
+              },
+              "response": []
+            },
+            {
+              "name": "Update note (FORMATEUR)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"note\": 16.0\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notes", "{{noteId}}"]
+                },
+                "description": "Modifie une note si moins de 14 jours se sont écoulés depuis la fin de la session. Retourne un DTO allégé (NoteDTO) avec les informations essentielles. Nécessite le rôle FORMATEUR."
+              },
+              "response": []
+            },
+            {
+              "name": "Get notes by session (FORMATEUR/ADMIN)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notes/session/{{sessionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notes", "session", "{{sessionId}}"]
+                },
+                "description": "Récupère toutes les notes d'une session. Retourne un DTO allégé (NoteDTO) avec les informations essentielles. Nécessite le rôle FORMATEUR ou ADMIN."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin (ADMIN seulement)",
+      "item": [
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "Create category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Java\",\n  \"description\": \"Cours Java\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "categories"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update category",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Java\",\n  \"description\": \"Cours Java\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/categories/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "categories", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete category",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/categories/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "categories", "1"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Formations",
+          "item": [
+            {
+              "name": "Create formation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Introduction à Spring\", \n    \"description\": \"Cours pour débuter avec Spring Boot\", \n    \"categoryId\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/formations",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "formations"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update formation",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Introduction à Spring\", \n    \"description\": \"Cours pour débuter avec Spring Boot\", \n    \"categoryId\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/formations/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "formations", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete formation",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/formations/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "formations", "1"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "List users",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create user",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstname\": \"Bob\",\n  \"lastname\": \"Martin\",\n  \"email\": \"bob@txlforma.fr\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete user",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "{{userId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "List formateurs",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/formateurs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "formateurs"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Sessions",
+          "item": [
+            {
+              "name": "Create session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"formationId\": 1,\n  \"formateurId\": 2,\n  \"startDate\": \"2025-02-01\",\n  \"endDate\": \"2025-02-03\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"17:00:00\",\n  \"location\": \"Salle B4\",\n  \"capacity\": 12,\n  \"price\": 500.0\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update session",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"formationId\": 1,\n  \"formateurId\": 2,\n  \"startDate\": \"2025-02-01\",\n  \"endDate\": \"2025-02-03\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"17:00:00\",\n  \"location\": \"Salle B4\",\n  \"capacity\": 12,\n  \"price\": 500.0\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions", "1"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete session",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sessions/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sessions", "1"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Files",
+          "item": [
+            {
+              "name": "Upload user image",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/files/upload/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "files", "upload", "users"]
+                },
+                "description": "Upload une image pour un utilisateur. Retourne l'URL du fichier."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload formation image",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/files/upload/formations",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "files", "upload", "formations"]
+                },
+                "description": "Upload une image pour une formation. Retourne l'URL du fichier."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload category image",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/files/upload/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "files", "upload", "categories"]
+                },
+                "description": "Upload une image pour une catégorie. Retourne l'URL du fichier."
+              },
+              "response": []
+            },
+            {
+              "name": "Get file",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/files/users/filename.jpg",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "files", "users", "filename.jpg"]
+                },
+                "description": "Récupère un fichier. Remplacez 'users' par 'formations' ou 'categories' selon le type. Public (pas d'authentification requise)."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Statistics",
+          "item": [
+            {
+              "name": "Get global statistics (ADMIN)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/statistics?startDate=2025-01-01&endDate=2025-12-31",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "statistics"],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "2025-01-01",
+                      "description": "Date de début (optionnel)"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2025-12-31",
+                      "description": "Date de fin (optionnel)"
+                    }
+                  ]
+                },
+                "description": "Récupère les statistiques globales (effectifs, taux de réussite, CA). Nécessite le rôle ADMIN. Les dates sont optionnelles."
+              },
+              "response": []
+            },
+            {
+              "name": "Get all formateurs statistics (ADMIN)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/statistics/formateurs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "statistics", "formateurs"]
+                },
+                "description": "Récupère les statistiques de tous les formateurs (sessions, participants, heures, notes). Nécessite le rôle ADMIN."
+              },
+              "response": []
+            },
+            {
+              "name": "Get formateur statistics (ADMIN)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/statistics/formateurs/{{formateurId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "statistics", "formateurs", "{{formateurId}}"]
+                },
+                "description": "Récupère les statistiques d'un formateur spécifique. Nécessite le rôle ADMIN."
+              },
+              "response": []
+            },
+            {
+              "name": "Get session details (ADMIN)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/statistics/sessions/{{sessionId}}/details",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "statistics",
+                    "sessions",
+                    "{{sessionId}}",
+                    "details"
+                  ]
+                },
+                "description": "Récupère les détails d'une session avec tous les participants, leurs signatures et notes. Nécessite le rôle ADMIN."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "panierId",
+      "value": "1"
+    },
+    {
+      "key": "checkoutSessionId",
+      "value": ""
+    },
+    {
+      "key": "checkoutUrl",
+      "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": "1"
+    },
+    {
+      "key": "participationId",
+      "value": "1"
+    },
+    {
+      "key": "noteId",
+      "value": "1"
+    },
+    {
+      "key": "attestationId",
+      "value": "1"
+    }
+  ]
+}

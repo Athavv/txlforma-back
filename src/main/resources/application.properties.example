@@ -1,0 +1,46 @@
+spring.application.name=txlforma
+
+# ============================================
+# TEMPLATE DE CONFIGURATION
+# ============================================
+# Ce fichier est un TEMPLATE sans secrets.
+# Pour le développement local :
+#   1. Copiez ce fichier : cp application.properties.example application.properties
+#   2. Remplissez application.properties avec vos vraies valeurs
+#   3. NE COMMITTEZ JAMAIS application.properties (il contient vos secrets)
+#
+# En production (Render), utilisez les variables d'environnement.
+# ============================================
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/txlforma_db?createDatabaseIfNotExist=true
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA Configuration
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# JWT Configuration
+# Générez un secret sécurisé : openssl rand -base64 32
+app.jwt.secret=VOTRE_SECRET_JWT_ICI_MINIMUM_32_CARACTERES
+app.jwt.expiration-ms=86400000
+
+# Stripe Configuration
+# Pour le développement : utilisez sk_test_xxx
+# Pour la production : utilisez sk_live_xxx
+stripe.secret-key=sk_test_VOTRE_CLE_STRIPE_ICI
+stripe.webhook-secret=whsec_VOTRE_WEBHOOK_SECRET_ICI
+
+# File Storage
+app.attestations.directory=attestations
+app.uploads.directory=uploads
+
+# Frontend URL (pour CORS et redirections)
+# Développement local : http://localhost:5173
+# Production : https://votre-frontend.vercel.app
+app.base-url=http://localhost:5173
+

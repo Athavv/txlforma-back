@@ -1,0 +1,23 @@
+# Maven and build outputs
+target
+
+# VCS
+.git
+.gitignore
+
+# IDE
+.idea
+.project
+.classpath
+.settings
+*.iml
+
+# OS / misc
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Node (if present in repo)
+node_modules
