@@ -31,8 +31,9 @@ public class SessionController {
     public ResponseEntity<List<Session>> getAllSessions(
             @RequestParam(required = false) Long formation,
             @RequestParam(required = false) Long formateur,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<Session> sessions = sessionService.getAllSessions(formation, formateur, date);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Boolean includePast) {
+        List<Session> sessions = sessionService.getAllSessions(formation, formateur, date, includePast);
         return ResponseEntity.ok(sessions);
     }
     

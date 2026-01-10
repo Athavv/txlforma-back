@@ -27,7 +27,7 @@ public class Emargement {
     private Participation participation;
 
     @Column(name = "signature_data", nullable = false, columnDefinition = "TEXT")
-    private String signatureData; // Base64
+    private String signatureData;
 
     @Column(name = "signed_at", nullable = false, updatable = false)
     private LocalDateTime signedAt;

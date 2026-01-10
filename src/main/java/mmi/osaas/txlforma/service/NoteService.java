@@ -10,13 +10,15 @@ import mmi.osaas.txlforma.model.Session;
 import mmi.osaas.txlforma.model.User;
 import mmi.osaas.txlforma.repository.NoteRepository;
 import mmi.osaas.txlforma.repository.ParticipationRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,37 +28,38 @@ public class NoteService {
 
     private final NoteRepository noteRepository;
     private final ParticipationRepository participationRepository;
+    @Lazy
+    private final AttestationService attestationService;
 
     @Transactional
     public NoteDTO createNote(Long participationId, Double noteValue, Long formateurId) {
         Participation participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Participation introuvable"));
-
         if (participation.getStatus() != ParticipationStatus.PRESENT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seuls les participants présents peuvent être notés");
         }
-
         Session session = participation.getSession();
         if (!session.getFormateur().getId().equals(formateurId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n'êtes pas le formateur de cette session");
         }
-
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+        ZonedDateTime sessionStart = ZonedDateTime.of(session.getStartDate(), session.getStartTime(), ZoneId.of("Europe/Paris"));
+        if (now.isBefore(sessionStart)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La session n'a pas encore commencé");
+        }
         if (noteValue < 0 || noteValue > 20) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La note doit être entre 0 et 20");
         }
-
         if (noteRepository.findByParticipationId(participationId).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Une note existe déjà pour cette participation");
         }
-
         Note note = Note.builder()
                 .participation(participation)
                 .givenBy(session.getFormateur())
                 .note(noteValue)
-                .createdAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now(ZoneId.of("Europe/Paris")).toLocalDateTime())
                 .locked(false)
                 .build();
-
         return toNoteDTO(noteRepository.save(note));
     }
 
@@ -64,27 +67,22 @@ public class NoteService {
     public NoteDTO updateNote(Long noteId, Double noteValue, Long formateurId) {
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note introuvable"));
-
         if (!note.getGivenBy().getId().equals(formateurId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n'êtes pas autorisé à modifier cette note");
         }
-
         if (note.getLocked()) {
             throw new NoteLockedException("Cette note est verrouillée et ne peut plus être modifiée");
         }
-
         if (isNoteLocked(note)) {
             note.setLocked(true);
             noteRepository.save(note);
             throw new NoteLockedException("Le délai de modification (14 jours) est dépassé");
         }
-
         if (noteValue < 0 || noteValue > 20) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La note doit être entre 0 et 20");
         }
-
         note.setNote(noteValue);
-        note.setModifiedAt(LocalDateTime.now());
+        note.setModifiedAt(ZonedDateTime.now(ZoneId.of("Europe/Paris")).toLocalDateTime());
         return toNoteDTO(noteRepository.save(note));
     }
 
@@ -103,15 +101,11 @@ public class NoteService {
     public NoteDTO getNoteByParticipation(Long participationId, Long userId) {
         Participation participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Participation introuvable"));
-
-        if (!participation.getUser().getId().equals(userId) && 
-            !participation.getSession().getFormateur().getId().equals(userId)) {
+        if (!participation.getUser().getId().equals(userId) && !participation.getSession().getFormateur().getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n'êtes pas autorisé à voir cette note");
         }
-
         Note note = noteRepository.findByParticipationId(participationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note introuvable"));
-        
         return toNoteDTO(note);
     }
 
@@ -119,7 +113,6 @@ public class NoteService {
         Participation participation = note.getParticipation();
         User user = participation.getUser();
         User formateur = note.getGivenBy();
-        
         return NoteDTO.builder()
                 .id(note.getId())
                 .note(note.getNote())
@@ -139,7 +132,8 @@ public class NoteService {
 
     private boolean isNoteLocked(Note note) {
         LocalDate deadline = note.getParticipation().getSession().getEndDate().plusDays(14);
-        return LocalDate.now().isAfter(deadline);
+        LocalDate now = ZonedDateTime.now(ZoneId.of("Europe/Paris")).toLocalDate();
+        return now.isAfter(deadline) || now.isEqual(deadline);
     }
 
     @Transactional
@@ -147,11 +141,9 @@ public class NoteService {
         List<Note> unlockableNotes = noteRepository.findAll().stream()
                 .filter(note -> !note.getLocked() && isNoteLocked(note))
                 .toList();
-        
         for (Note note : unlockableNotes) {
             note.setLocked(true);
             noteRepository.save(note);
-
             if (note.getNote() >= 10) {
                 Participation participation = note.getParticipation();
                 if (participation.getStatus() != ParticipationStatus.VALIDE) {
@@ -160,6 +152,6 @@ public class NoteService {
                 }
             }
         }
+        attestationService.generateSuccessAttestations();
     }
 }
-

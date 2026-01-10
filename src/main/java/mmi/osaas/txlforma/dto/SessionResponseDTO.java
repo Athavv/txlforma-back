@@ -25,10 +25,16 @@ public class SessionResponseDTO {
     
     private Long formationId;
     private String formationTitle;
+    private String formationDescription; 
     private String formationImageUrl;
     
     private Long formateurId;
     private String formateurName;
     
+    private Long categoryId;
+    private String categoryName;
+
+    private Integer participantsCount;
+
     private LocalDateTime createdAt;
 }

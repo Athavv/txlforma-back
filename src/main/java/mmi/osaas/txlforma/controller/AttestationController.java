@@ -1,6 +1,7 @@
 package mmi.osaas.txlforma.controller;
 
 import lombok.RequiredArgsConstructor;
+import mmi.osaas.txlforma.dto.AttestationDTO;
 import mmi.osaas.txlforma.model.Attestation;
 import mmi.osaas.txlforma.security.UserPrincipal;
 import mmi.osaas.txlforma.service.AttestationService;
@@ -42,9 +43,9 @@ public class AttestationController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<Attestation>> getMyAttestations(
+    public ResponseEntity<List<AttestationDTO>> getMyAttestations(
             @AuthenticationPrincipal UserPrincipal principal) {
-        List<Attestation> attestations = attestationService.getMyAttestations(principal.getId());
+        List<AttestationDTO> attestations = attestationService.getMyAttestations(principal.getId());
         return ResponseEntity.ok(attestations);
     }
 }

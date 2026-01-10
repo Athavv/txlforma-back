@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,50 +33,39 @@ public class EmargementService {
     public Emargement signParticipation(Long participationId, String signatureData, Long userId) {
         Participation participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Participation introuvable"));
-
         if (!participation.getUser().getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n'êtes pas autorisé à signer cette participation");
         }
-
         if (emargementRepository.existsByParticipationId(participationId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vous avez déjà signé pour cette session");
         }
-
         Session session = participation.getSession();
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime sessionStart = session.getStartDate().atTime(session.getStartTime());
-        LocalDateTime sessionEnd = session.getEndDate().atTime(session.getEndTime());
-
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+        ZonedDateTime sessionStart = ZonedDateTime.of(session.getStartDate(), session.getStartTime(), ZoneId.of("Europe/Paris"));
+        ZonedDateTime sessionEnd = ZonedDateTime.of(session.getEndDate(), session.getEndTime(), ZoneId.of("Europe/Paris"));
         if (now.isBefore(sessionStart)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La session n'a pas encore commencé");
         }
-
         if (now.isAfter(sessionEnd)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La session est terminée");
         }
-
         if (signatureData == null || signatureData.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La signature est requise");
         }
-
         Emargement emargement = Emargement.builder()
                 .participation(participation)
                 .signatureData(signatureData)
-                .signedAt(LocalDateTime.now())
+                .signedAt(ZonedDateTime.now(ZoneId.of("Europe/Paris")).toLocalDateTime())
                 .present(true)
                 .build();
-
         emargement = emargementRepository.save(emargement);
-
         participation.setStatus(ParticipationStatus.PRESENT);
-        participation.setParticipationAt(LocalDateTime.now());
+        participation.setParticipationAt(ZonedDateTime.now(ZoneId.of("Europe/Paris")).toLocalDateTime());
         participationRepository.save(participation);
-
         try {
             attestationService.generateAttestation(participationId);
         } catch (Exception ignored) {
         }
-
         return emargement;
     }
 
@@ -88,22 +78,17 @@ public class EmargementService {
     public EmargementDTO getEmargementByParticipation(Long participationId, Long userId) {
         Participation participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Participation introuvable"));
-
-        if (!participation.getUser().getId().equals(userId) && 
-            !participation.getSession().getFormateur().getId().equals(userId)) {
+        if (!participation.getUser().getId().equals(userId) && !participation.getSession().getFormateur().getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n'êtes pas autorisé à voir cet émargement");
         }
-
         Emargement emargement = emargementRepository.findByParticipationId(participationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Émargement introuvable"));
-        
         return toEmargementDTO(emargement);
     }
 
     private EmargementDTO toEmargementDTO(Emargement emargement) {
         Participation participation = emargement.getParticipation();
         User user = participation.getUser();
-        
         return EmargementDTO.builder()
                 .id(emargement.getId())
                 .signatureData(emargement.getSignatureData())
@@ -119,4 +104,3 @@ public class EmargementService {
                 .build();
     }
 }
-

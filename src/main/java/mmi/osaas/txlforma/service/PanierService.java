@@ -152,7 +152,6 @@ public class PanierService {
             return false;
         }
         
-        // Si même jour, vérifier les heures
         if (session1.getStartDate().equals(session2.getStartDate()) 
                 && session1.getEndDate().equals(session2.getEndDate())) {
             return !session1.getEndTime().isBefore(session2.getStartTime()) 

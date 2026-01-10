@@ -16,9 +16,15 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class ParticipationDTO {
+
     private Long id;
     private ParticipationStatus status;
     private LocalDateTime participationAt;
+    private LocalDateTime createdAt;
+
+
+    private Double note;
+
     private Long sessionId;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -26,12 +32,18 @@ public class ParticipationDTO {
     private LocalTime endTime;
     private String location;
     private Double price;
+
     private Long formationId;
     private String formationTitle;
+    private String formationDescription;
     private String formationImageUrl;
-    private Long formateurId;
-    private String formateurName;
-    private PaiementStatus paiementStatus;
-    private LocalDateTime createdAt;
-}
+    private String categoryName;
 
+    private Long formateurId;
+    private String formateurFirstname;
+    private String formateurLastname;
+    private String formateurImageUrl;
+
+
+    private PaiementStatus paiementStatus;
+}

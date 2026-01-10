@@ -28,7 +28,7 @@ public class JwtUtils {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
         return Jwts.builder()
-                .subject(userPrincipal.getUsername()) // email
+                .subject(userPrincipal.getUsername())
                 .claim("userId", userPrincipal.getId())
                 .claim("role", userPrincipal.getUser().getRole().name())
                 .issuedAt(new Date())

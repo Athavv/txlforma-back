@@ -11,7 +11,7 @@ import mmi.osaas.txlforma.enums.ParticipationStatus;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "participations", 
+@Table(name = "participations",
        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "session_id"}))
 @Data
 @NoArgsConstructor
@@ -47,5 +47,7 @@ public class Participation {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-}
 
+    @Column(name = "note")
+    private Double note;
+}

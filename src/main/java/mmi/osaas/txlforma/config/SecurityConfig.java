@@ -2,10 +2,8 @@ package mmi.osaas.txlforma.config;
 
 import lombok.RequiredArgsConstructor;
 import mmi.osaas.txlforma.security.jwt.JwtAuthFilter;
-import mmi.osaas.txlforma.security.jwt.JwtAuthenticationEntryPoint;
-import mmi.osaas.txlforma.security.util.JwtUtils;
+import mmi.osaas.txlforma.security.jwt.JwtAuthenticationEntryPoint;import mmi.osaas.txlforma.security.util.JwtUtils;
 import mmi.osaas.txlforma.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -23,7 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -33,9 +30,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
     private final JwtUtils jwtUtils;
-
-    @Value("${app.base-url:http://localhost:5173}")
-    private String baseUrl;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -60,37 +54,39 @@ public class SecurityConfig {
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC - Accès sans authentification
+
+                        // PUBLIC
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/payments/webhook").permitAll()
-                        
-                        // PUBLIC READ - Lecture publique (GET uniquement)
+
+                        // PUBLIC READ
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/formations/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sessions/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/files/**").permitAll()
-                        
-                        // AUTHENTICATED - Tous les utilisateurs connectés
+                        .requestMatchers(HttpMethod.GET, "/api/participations/session/**").permitAll()
+
+                        // AUTHENTICATED 
                         .requestMatchers("/api/payments/**").authenticated()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers("/api/users/{id}").authenticated()
                         .requestMatchers("/api/panier/**").authenticated()
                         .requestMatchers("/api/participations/me").authenticated()
-                        .requestMatchers("/api/participations/**").authenticated()
                         .requestMatchers("/api/emargements/**").authenticated()
                         .requestMatchers("/api/notes/**").authenticated()
                         .requestMatchers("/api/attestations/**").authenticated()
-                        
-                        // FILE UPLOAD - Upload de fichiers authentifié
+                        .requestMatchers(HttpMethod.POST, "/api/files/upload/users").permitAll()
+
+                        // FILE UPLOAD
                         .requestMatchers(HttpMethod.POST, "/api/files/upload/**").authenticated()
-                        
-                        // FORMATEUR/ADMIN - Formateurs et administrateurs
+
+                        // FORMATEUR/ADMIN
                         .requestMatchers("/api/emargements/session/**").hasAnyRole("FORMATEUR", "ADMIN")
                         .requestMatchers("/api/notes/session/**").hasAnyRole("FORMATEUR", "ADMIN")
                         .requestMatchers("/api/formateur/**").hasRole("FORMATEUR")
-                        
-                        // ADMIN ONLY - Administrateurs uniquement
+
+                        // ADMIN ONLY
                         .requestMatchers("/api/statistics/**").hasRole("ADMIN")
                         .requestMatchers("/api/attestations/regenerate/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
@@ -105,8 +101,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/sessions/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/sessions/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/sessions/**").hasRole("ADMIN")
-                        
-                        // FALLBACK - Toute autre requête nécessite une authentification
+
+                        // FALLBACK
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -118,16 +114,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Liste des origines autorisées : localhost pour le dev + URL de production depuis app.base-url
-        List<String> allowedOrigins = Arrays.asList(
+        config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:3000",
                 "http://127.0.0.1:5173",
-                "http://127.0.0.1:3000",
-                baseUrl  // URL de production depuis la variable d'environnement
-        );
+                "http://127.0.0.1:3000"
+        ));
 
-        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

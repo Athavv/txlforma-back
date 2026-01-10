@@ -22,7 +22,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstname\": \"Lango\",\n  \"lastname\": \"Packianathan\",\n  \"email\": \"lango@txlforma.fr\",\n  \"username\": \"lango\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"firstname\": \"Lango\",\n  \"lastname\": \"Packianathan\",\n  \"email\": \"lango@txlforma.fr\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/register",
@@ -169,7 +169,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/sessions?formation=1&formateur=2&date=2025-02-01",
+                  "raw": "{{baseUrl}}/api/sessions?formation=1&formateur=2&date=2025-02-01&includePast=false",
                   "host": ["{{baseUrl}}"],
                   "path": ["api", "sessions"],
                   "query": [
@@ -187,6 +187,11 @@
                       "key": "date",
                       "value": "2025-02-01",
                       "description": "Date de début (format: YYYY-MM-DD, optionnel)"
+                    },
+                    {
+                      "key": "includePast",
+                      "value": "false",
+                      "description": "Inclure les sessions passées (optionnel, défaut: false)"
                     }
                   ]
                 }

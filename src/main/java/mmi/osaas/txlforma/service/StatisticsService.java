@@ -179,6 +179,7 @@ public class StatisticsService {
                     details.put("userId", participation.getUser().getId());
                     details.put("userName", participation.getUser().getFirstname() + " " + participation.getUser().getLastname());
                     details.put("userEmail", participation.getUser().getEmail());
+                    details.put("userImageUrl", participation.getUser().getImageUrl());
                     details.put("status", "PAYE");
                     Paiement paiement = participation.getPaiement();
                     if (paiement != null) {
@@ -206,6 +207,18 @@ public class StatisticsService {
                         details.put("note", note.getNote());
                         details.put("noteLocked", note.getLocked());
                     }
+
+                    List<Attestation> attestations = attestationRepository.findByParticipationId(participation.getId());
+                    List<Map<String, Object>> attestationsList = attestations.stream()
+                            .map(attestation -> {
+                                Map<String, Object> attMap = new HashMap<>();
+                                attMap.put("id", attestation.getId());
+                                attMap.put("type", attestation.getType().toString());
+                                attMap.put("generatedAt", attestation.getGeneratedAt());
+                                return attMap;
+                            })
+                            .collect(Collectors.toList());
+                    details.put("attestations", attestationsList);
 
                     return details;
                 })
