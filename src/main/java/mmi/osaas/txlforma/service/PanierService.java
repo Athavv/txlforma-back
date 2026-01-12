@@ -75,6 +75,17 @@ public class PanierService {
         checkSessionAvailability(session);
 
         List<PanierSession> existingSessions = panierSessionRepository.findByPanierId(panier.getId());
+        
+        // Vérifier si une session de la même formation est déjà dans le panier
+        existingSessions.stream()
+                .filter(panierSession -> panierSession.getSession().getFormation().getId().equals(session.getFormation().getId()))
+                .findFirst()
+                .ifPresent(existingSession -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                            "Vous avez déjà une session de cette formation dans votre panier. " +
+                            "Vous ne pouvez pas réserver plusieurs sessions de la même formation en même temps.");
+                });
+        
         existingSessions.stream()
                 .filter(panierSession -> sessionsOverlap(session, panierSession.getSession()))
                 .findFirst()
